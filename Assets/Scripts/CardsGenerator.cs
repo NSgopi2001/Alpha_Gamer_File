@@ -4,15 +4,21 @@ using UnityEngine;
 
 public class CardsGenerator : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField] private Transform gridPanel;
+    [SerializeField] private GameObject cardPrefab;
+    [SerializeField] private int numberOfCards = 6;
+
+    private void Awake()
     {
-        
+        GenerateCards();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void GenerateCards()
     {
-        
+        for (int i = 0; i < numberOfCards; i++)
+        {
+            GameObject card = Instantiate(cardPrefab, gridPanel);
+            card.name = "Card_" + i;
+        }
     }
 }
