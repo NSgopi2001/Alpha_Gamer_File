@@ -37,7 +37,7 @@ public class GameController : MonoBehaviour
     private GameObject gameCompleteText;
 
     [SerializeField]
-    private AudioClip cardClickClip, cardMatchClip, cardUnmatchClip, gameOverClip;
+    private AudioClip firstClickClip, secondClickClip, cardMatchClip, cardUnmatchClip, gameOverClip;
 
     private void Awake()
     {
@@ -149,7 +149,7 @@ public class GameController : MonoBehaviour
 
             cardButtonList[firstGuessIndex].interactable = false;
             cardButtonList[firstGuessIndex].GetComponent<Card>().ShowFront();
-            audioSource.PlayOneShot(cardClickClip);
+            audioSource.PlayOneShot(firstClickClip);
         }
         else if (!secondGuess)
         {
@@ -160,7 +160,7 @@ public class GameController : MonoBehaviour
             cardButtonList[secondGuessIndex].interactable = false;
             cardButtonList[secondGuessIndex].GetComponent<Card>().ShowFront();
 
-            audioSource.PlayOneShot(cardClickClip);
+            audioSource.PlayOneShot(secondClickClip);
 
             ScoreManager.Instance.IncrementMoves();
             CheckCardNames();
@@ -278,6 +278,7 @@ public class GameController : MonoBehaviour
         audioSource.PlayOneShot(gameOverClip);
         gameCompleteText.SetActive(true);
 
+        UIButtonsEnable();
     }
 
     private void Shuffle(List<CardScriptableObject> list)
