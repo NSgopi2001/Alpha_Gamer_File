@@ -6,13 +6,27 @@ using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
 {
+    [SerializeField]
+    private Sprite bgSprite;
+
+    public CardScriptableObject[] cardSOArray;
+
+    public List<CardScriptableObject> cardSOList = new List<CardScriptableObject>();
+
     public List<Button> cardsList = new List<Button>();
+
+    private void Awake()
+    {
+        cardSOArray = Resources.LoadAll<CardScriptableObject>("CardSO");  
+    }
 
     void Start()
     {
         LoadAllCards();
 
         AddListeners();
+
+        AddCardData();
     }
 
     private void LoadAllCards()
@@ -30,6 +44,7 @@ public class GameController : MonoBehaviour
             Button btn = cards.GetComponent<Button>();
             if (btn != null)
             {
+                btn.image.sprite = bgSprite;
                 cardsList.Add(btn);
             }
             else
@@ -41,6 +56,22 @@ public class GameController : MonoBehaviour
         Debug.Log($"Loaded {cardsList.Count} cards.");
     }
 
+    private void AddCardData()
+    {
+        int looper = cardsList.Count;
+        int index = 0;
+
+        for (int i = 0; i < looper; i++)
+        {
+            if(index == looper/2)
+            {
+                index = 0;
+            }
+            cardSOList.Add(cardSOArray[index]);
+            index++;
+        }
+
+    }
 
     private void AddListeners()
     {
