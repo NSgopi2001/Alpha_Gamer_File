@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameSettings : MonoBehaviour
 {
@@ -9,7 +10,11 @@ public class GameSettings : MonoBehaviour
 
     public List<CardSaveData> LastSavedCards = new List<CardSaveData>();
 
+    public static bool hasContinued = false;
+
     private string savePath => Path.Combine(Application.persistentDataPath, "game_save.json");
+
+    public Button continueButton;
 
     void Awake()
     {
@@ -23,6 +28,20 @@ public class GameSettings : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
+    private void Start()
+    {
+        if (HasSaveData())
+        {
+            continueButton.interactable = true;
+
+            // Load grid size from save file
+            string json = File.ReadAllText(savePath);
+            GameSaveData loadedData = JsonUtility.FromJson<GameSaveData>(json);
+            SelectedGridSize = loadedData.gridSize;
+        }
+    }
+
 
     // Called from UI with int index
     public void SetGridSizeByIndex(int index)
@@ -40,12 +59,20 @@ public class GameSettings : MonoBehaviour
     [System.Serializable]
     public class GameSaveData
     {
+        public GridEnum.GridSize gridSize;
         public List<CardSaveData> cards = new List<CardSaveData>();
     }
 
+
+    /// <summary>
+    /// Saves grid size and card data to persistent path.
+    /// </summary>
     public void SaveGame(List<Card> cards)
     {
-        GameSaveData saveData = new GameSaveData();
+        GameSaveData saveData = new GameSaveData
+        {
+            gridSize = SelectedGridSize
+        };
 
         foreach (Card card in cards)
         {
@@ -59,12 +86,13 @@ public class GameSettings : MonoBehaviour
 
         string json = JsonUtility.ToJson(saveData, true);
         File.WriteAllText(savePath, json);
-        LastSavedCards = saveData.cards;
-
         Debug.Log($"Game saved to {savePath}");
     }
 
-    public List<CardSaveData> LoadGame()
+    /// <summary>
+    /// Loads saved grid size and card data from persistent path.
+    /// </summary>
+    public GameSaveData LoadGame()
     {
         if (!File.Exists(savePath))
         {
@@ -74,14 +102,41 @@ public class GameSettings : MonoBehaviour
 
         string json = File.ReadAllText(savePath);
         GameSaveData loadedData = JsonUtility.FromJson<GameSaveData>(json);
-        LastSavedCards = loadedData.cards;
+
+        // Restore grid size
+        SelectedGridSize = loadedData.gridSize;
 
         Debug.Log("Game loaded from file.");
-        return LastSavedCards;
+        return loadedData;
     }
 
+    /// <summary>
+    /// Check if save file exists.
+    /// </summary>
     public bool HasSaveData()
     {
         return File.Exists(savePath);
+    }
+
+    /// <summary>
+    /// Delete the saved file (optional utility).
+    /// </summary>
+    public void ClearSaveData()
+    {
+        if (File.Exists(savePath))
+        {
+            File.Delete(savePath);
+            Debug.Log("Save file deleted.");
+        }
+    }
+
+    public void SetContinueBool(bool value)
+    {
+        hasContinued = value;
+    }
+
+    public bool GetContinueBool()
+    {
+        return hasContinued;
     }
 }

@@ -21,7 +21,7 @@ public class GameController : MonoBehaviour
 
     private bool firstGuess, secondGuess;
 
-    private int countGuesses;
+    //private int countGuesses;
     private int countCorrectGuesses;
     private int gameGuesses;
 
@@ -29,9 +29,12 @@ public class GameController : MonoBehaviour
 
     private string firstGuessName, secondGuessName;
 
+    [SerializeField] private List<Button> extraButtonsToDisable;
+
     private void Awake()
     {
-        cardSOArray = Resources.LoadAll<CardScriptableObject>("CardSO");  
+        cardSOArray = Resources.LoadAll<CardScriptableObject>("CardSO");
+
     }
 
     void Start()
@@ -47,6 +50,11 @@ public class GameController : MonoBehaviour
         ApplyCardSprites(cardButtonList);
 
         gameGuesses = cardSOList.Count / 2;
+
+        if (GameSettings.Instance && GameSettings.Instance.GetContinueBool())
+        {
+            LoadGame();
+        }
 
         StartCoroutine(PreviewCardsCoroutine());
     }
@@ -141,7 +149,7 @@ public class GameController : MonoBehaviour
             cardButtonList[secondGuessIndex].interactable = false;
             cardButtonList[secondGuessIndex].GetComponent<Card>().ShowFront();
 
-            countGuesses++;
+            ScoreManager.Instance.IncrementMoves();
             CheckCardNames();
         }
     }
@@ -170,6 +178,9 @@ public class GameController : MonoBehaviour
             firstCard.GetComponent<Card>().IsMatched = true;
             secondCard.GetComponent<Card>().IsMatched = true;
 
+
+            ScoreManager.Instance.AddMatchPoints(10);
+
             countCorrectGuesses++;
             CheckIfGameIsFinished();
         }
@@ -183,6 +194,8 @@ public class GameController : MonoBehaviour
             firstCard.interactable = true;
             secondCard.interactable = true;
 
+            ScoreManager.Instance.ResetCombo();
+            ScoreManager.Instance.AddMatchPoints(-2);
             //firstCard.image.sprite = bgSprite;
             //secondCard.image.sprite = bgSprite;
         }
@@ -191,24 +204,40 @@ public class GameController : MonoBehaviour
     IEnumerator PreviewCardsCoroutine()
     {
         int previeTimer = 2;
-        // Step 1: Flip all cards to front
+
+        // Disable extra UI buttons
+        foreach (var btn in extraButtonsToDisable)
+        {
+            btn.interactable = false;
+        }
+
+        // Flip all cards to front
         foreach (var button in cardButtonList)
         {
             button.GetComponent<Card>().ShowFront();
-            button.interactable = false; 
+            button.interactable = false;
         }
 
-        if(GameSettings.Instance && GameSettings.Instance.SelectedGridSize == GridEnum.GridSize.Grid_5x6)
+        // Adjust preview time for larger grids
+        if (GameSettings.Instance && GameSettings.Instance.SelectedGridSize == GridEnum.GridSize.Grid_5x6)
             previeTimer = 4;
+
         yield return new WaitForSeconds(previeTimer);
 
-        
+        // Flip cards back and enable interaction
         foreach (var button in cardButtonList)
         {
             button.GetComponent<Card>().ShowBack();
-            button.interactable = true; // now allow player to click
+            button.interactable = true;
+        }
+
+        // Re-enable the UI buttons
+        foreach (var btn in extraButtonsToDisable)
+        {
+            btn.interactable = true;
         }
     }
+
 
 
     private void CheckIfGameIsFinished()
@@ -232,6 +261,10 @@ public class GameController : MonoBehaviour
 
     public void SaveGame()
     {
+        if (!GameSettings.Instance)
+        {
+            return;
+        }
         List<Card> cards = new List<Card>();
         foreach (Button btn in cardButtonList)
         {
@@ -241,37 +274,42 @@ public class GameController : MonoBehaviour
         }
 
         GameSettings.Instance.SaveGame(cards);
+
+        if (ScoreManager.Instance)
+        {
+            ScoreManager.Instance.SaveScoreData();
+        }
     }
 
     public void LoadGame()
     {
-        var loadedCards = GameSettings.Instance.LoadGame();
-        if (loadedCards == null || loadedCards.Count == 0)
+        if (!GameSettings.Instance)
+        {
             return;
+        }
+
+        var loadedData = GameSettings.Instance.LoadGame();
+        if (loadedData == null || loadedData.cards.Count == 0) return;
 
         cardSOList.Clear();
 
-        foreach (var savedCard in loadedCards)
+        foreach (var savedCard in loadedData.cards)
         {
             CardScriptableObject cardSO = System.Array.Find(cardSOArray, c => c.cardName == savedCard.cardName);
             if (cardSO != null)
             {
                 cardSOList.Add(cardSO);
             }
-            else
-            {
-                Debug.LogWarning("Card not found in resources: " + savedCard.cardName);
-            }
         }
 
         ApplyCardSprites(cardButtonList);
 
-        for (int i = 0; i < loadedCards.Count; i++)
+        for (int i = 0; i < loadedData.cards.Count; i++)
         {
             Card card = cardButtonList[i].GetComponent<Card>();
             if (card != null)
             {
-                card.IsMatched = loadedCards[i].isMatched;
+                card.IsMatched = loadedData.cards[i].isMatched;
 
                 if (card.IsMatched)
                 {
@@ -286,7 +324,25 @@ public class GameController : MonoBehaviour
             }
         }
 
+        // Reset internal game state
+        firstGuess = secondGuess = false;
+        firstGuessIndex = secondGuessIndex = 0;
+        firstGuessName = secondGuessName = string.Empty;
+        countCorrectGuesses = 0;
+        //ScoreManager.Instance.ResetScore();
+        //ScoreManager.Instance.ResetCombo();
+        gameGuesses = loadedData.cards.Count / 2;
+
         Debug.Log("Game state applied from saved data.");
+
+
+        if (ScoreManager.Instance)
+        {
+            ScoreManager.Instance.LoadScoreData();
+        }
+
+        
     }
+
 
 }

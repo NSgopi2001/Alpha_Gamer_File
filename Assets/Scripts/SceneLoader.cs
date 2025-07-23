@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class SceneLoader : MonoBehaviour
 {
-    public void LoadScene(string sceneName)
+    public void ContinueScene(string sceneName)
     {
         SceneManager.LoadScene(sceneName);
     }
@@ -13,6 +13,12 @@ public class SceneLoader : MonoBehaviour
     public void ExitApp()
     {
         Application.Quit();
+    }
+
+    public void LoadScene(string sceneName)
+    {
+        SceneManager.LoadScene(sceneName);
+        GameSettings.Instance.SetContinueBool(false);
     }
 }
 
