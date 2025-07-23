@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Fennekin
   m_EditorClassIdentifier: 
   cardName: Fennekin
-  cardIndex: 7
+  cardIndex: 5
   cardSprite: {fileID: 21300000, guid: 85ec2fbfdf4b7ee43a7d16b031c35efc, type: 3}
   isMatched: 0

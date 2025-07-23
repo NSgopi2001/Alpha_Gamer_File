@@ -1,13 +1,13 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CardDisplay : MonoBehaviour
+public class Card : MonoBehaviour
 {
     [Header("Card Data")]
     public CardScriptableObject cardData;
 
     [Header("UI References")]
-    public Image cardFrontImage;
+    private Image cardFrontImage;
 
     //public Text cardNameText; // Optional if you want name display
 
@@ -29,10 +29,6 @@ public class CardDisplay : MonoBehaviour
             cardFrontImage.sprite = cardData.cardSprite;
     }
 
-    public int GetCardId()
-    {
-        return cardData != null ? cardData.cardIndex : -1;
-    }
 
     public string GetCardName()
     {

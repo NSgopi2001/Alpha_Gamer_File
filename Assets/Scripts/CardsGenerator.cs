@@ -18,7 +18,7 @@ public class CardsGenerator : MonoBehaviour
         for (int i = 0; i < numberOfCards; i++)
         {
             GameObject card = Instantiate(cardPrefab, gridPanel);
-            card.name = "Card_" + i;
+            card.name = "" + i;
         }
     }
 }

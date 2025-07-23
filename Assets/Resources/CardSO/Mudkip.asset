@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Mudkip
   m_EditorClassIdentifier: 
   cardName: Mudkip
-  cardIndex: 11
+  cardIndex: 7
   cardSprite: {fileID: 21300000, guid: d302783aa4d2aa34c9f96ef181d23c6a, type: 3}
   isMatched: 0

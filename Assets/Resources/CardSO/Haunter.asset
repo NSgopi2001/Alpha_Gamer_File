@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Haunter
   m_EditorClassIdentifier: 
   cardName: Haunter
-  cardIndex: 8
+  cardIndex: 6
   cardSprite: {fileID: 21300000, guid: e8c0bf93e993ec649bb3fa302bdf3e5a, type: 3}
   isMatched: 0

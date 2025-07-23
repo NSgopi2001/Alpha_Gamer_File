@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Turtwig
   m_EditorClassIdentifier: 
   cardName: Turtwig
-  cardIndex: 19
+  cardIndex: 18
   cardSprite: {fileID: 21300000, guid: 089c95e16d20955488721103bf89ae45, type: 3}
   isMatched: 0

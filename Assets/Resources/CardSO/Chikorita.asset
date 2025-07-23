@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Chikorita
   m_EditorClassIdentifier: 
   cardName: Chikorita
-  cardIndex: 6
+  cardIndex: 3
   cardSprite: {fileID: 21300000, guid: 82e7a5e1e39b5d44190fc38c2796f2a9, type: 3}
   isMatched: 0

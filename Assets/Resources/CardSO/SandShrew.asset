@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: SandShrew
   m_EditorClassIdentifier: 
   cardName: Sandshrew
-  cardIndex: 15
+  cardIndex: 14
   cardSprite: {fileID: 21300000, guid: 92db4b07073c63747ae23391a39fc5df, type: 3}
   isMatched: 0
