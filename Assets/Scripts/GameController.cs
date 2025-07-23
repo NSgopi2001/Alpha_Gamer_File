@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
+using Unity.VisualScripting;
 using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 using UnityEngine.UI;
@@ -41,8 +43,27 @@ public class GameController : MonoBehaviour
 
         Shuffle(cardSOList);
 
+        ApplyCardSprites(cardButtonList);
+
         gameGuesses = cardSOList.Count / 2;
     }
+
+    private void ApplyCardSprites(List<Button> cardList)
+    {
+        for (int i = 0; i < cardList.Count; i++)
+        {
+            Card cardComponent = cardList[i].GetComponent<Card>();
+            if (cardComponent != null)
+            {
+                cardComponent.SetCardSprite(cardSOList[i].cardSprite);
+            }
+            else
+            {
+                Debug.LogWarning($"No Card component found on {cardList[i].name}");
+            }
+        }
+    }
+
 
     private void LoadAllCards()
     {
@@ -54,9 +75,9 @@ public class GameController : MonoBehaviour
             return;
         }
 
-        foreach (GameObject cards in cardsArray)
+        foreach (GameObject card in cardsArray)
         {
-            Button btn = cards.GetComponent<Button>();
+            Button btn = card.GetComponent<Button>();
             if (btn != null)
             {
                 btn.image.sprite = bgSprite;
@@ -64,7 +85,7 @@ public class GameController : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning($"GameObject {cards.name} is tagged 'Card' but has no Button component.");
+                Debug.LogWarning($"GameObject {card.name} is tagged 'Card' but has no Button component.");
             }
         }
 
@@ -83,7 +104,7 @@ public class GameController : MonoBehaviour
                 index = 0;
             }
             cardSOList.Add(cardSOArray[index]);
-            //cardsList[i].GetComponent<Card>().cardData = cardSOList[index];
+            //cardButtonList[i].GetComponent<Card>().cardSO = cardSOList[index];
             index++;
         }
 
@@ -91,46 +112,39 @@ public class GameController : MonoBehaviour
 
     private void AddListeners()
     {
-        foreach (Button cardButtons in cardButtonList)
+        for (int i = 0; i < cardButtonList.Count; i++)
         {
-            cardButtons.onClick.AddListener(() => PickCard());
+            int index = i; 
+            cardButtonList[i].onClick.AddListener(() => PickCard(index));
         }
     }
 
-    private void PickCard()
-    {
-        string _cardName = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.name;
 
+    private void PickCard(int index)
+    {
         if (!firstGuess)
         {
             firstGuess = true;
+            firstGuessIndex = index;
+            firstGuessName = cardSOList[firstGuessIndex].cardName;
 
-            firstGuessIndex = int.Parse(_cardName);
-
-            firstGuessName = cardSOList[firstGuessIndex].name;
-
-            cardButtonList[firstGuessIndex].image.sprite = cardSOList[firstGuessIndex].cardSprite;
             cardButtonList[firstGuessIndex].interactable = false;
-            cardButtonList[firstGuessIndex].animator.SetBool("Front", true);
+            cardButtonList[firstGuessIndex].GetComponent<Card>().ShowFront();
         }
         else if (!secondGuess)
         {
             secondGuess = true;
+            secondGuessIndex = index;
+            secondGuessName = cardSOList[secondGuessIndex].cardName;
 
-            secondGuessIndex = int.Parse(_cardName);
-
-            secondGuessName = cardSOList[secondGuessIndex].name;
-
-            cardButtonList[secondGuessIndex].image.sprite = cardSOList[secondGuessIndex].cardSprite;
             cardButtonList[secondGuessIndex].interactable = false;
-            cardButtonList[secondGuessIndex].animator.SetBool("Front", true);
+            cardButtonList[secondGuessIndex].GetComponent<Card>().ShowFront();
 
             countGuesses++;
-
             CheckCardNames();
-
         }
     }
+
 
     void CheckCardNames()
     {
@@ -147,23 +161,26 @@ public class GameController : MonoBehaviour
             //firstCard.interactable = false;
             //secondCard.interactable = false;
 
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(1f);
 
-            firstCard.image.enabled = false;
-            secondCard.image.enabled = false;
+            firstCard.GetComponent<Card>().HideCard();
+            secondCard.GetComponent<Card>().HideCard();
 
             countCorrectGuesses++;
             CheckIfGameIsFinished();
         }
         else
         {
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(1f);
+
+            firstCard.GetComponent<Card>().ShowBack();
+            secondCard.GetComponent<Card>().ShowBack();
 
             firstCard.interactable = true;
             secondCard.interactable = true;
 
-            firstCard.image.sprite = bgSprite;
-            secondCard.image.sprite = bgSprite;
+            //firstCard.image.sprite = bgSprite;
+            //secondCard.image.sprite = bgSprite;
         }
     }
 
@@ -183,6 +200,7 @@ public class GameController : MonoBehaviour
             CardScriptableObject temp = list[i];
             list[i] = list[randomIndex];
             list[randomIndex] = temp;
+            cardButtonList[i].GetComponent<Card>().cardSO = list[i];
         }
     }
 }

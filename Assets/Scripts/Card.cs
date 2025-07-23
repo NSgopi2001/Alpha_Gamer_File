@@ -3,35 +3,37 @@ using UnityEngine.UI;
 
 public class Card : MonoBehaviour
 {
-    [Header("Card Data")]
-    public CardScriptableObject cardData;
+    public CardScriptableObject cardSO;
 
-    [Header("UI References")]
-    private Image cardFrontImage;
-
-    //public Text cardNameText; // Optional if you want name display
+    [SerializeField] private Image cardFrontImage;
 
     private void Start()
     {
-        if (cardData != null)
+        if (cardSO != null)
         {
-            ApplyCardData();
-        }
-        else
-        {
-            Debug.LogWarning($"CardData not set on {gameObject.name}");
+            cardFrontImage.sprite = cardSO.cardSprite;
         }
     }
 
-    public void ApplyCardData()
+    public void SetCardSprite(Sprite sprite)
     {
-        if (cardFrontImage != null)
-            cardFrontImage.sprite = cardData.cardSprite;
+        cardFrontImage.sprite = sprite;
     }
 
-
-    public string GetCardName()
+    public void ShowFront()
     {
-        return cardData != null ? cardData.cardName : "Unknown";
+        GetComponent<Animator>().SetBool("Back", false);
+        GetComponent<Animator>().SetBool("Front", true);
+    }
+
+    public void ShowBack()
+    {
+        GetComponent<Animator>().SetBool("Front", false);
+        GetComponent<Animator>().SetBool("Back", true);
+    }
+
+    public void HideCard()
+    {
+        GetComponent<Image>().enabled = false;
     }
 }
