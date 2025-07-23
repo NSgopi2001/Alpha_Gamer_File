@@ -442,7 +442,7 @@ MonoBehaviour:
   m_StartAxis: 0
   m_CellSize: {x: 200, y: 200}
   m_Spacing: {x: 10, y: 10}
-  m_Constraint: 1
+  m_Constraint: 0
   m_ConstraintCount: 3
 --- !u!1 &441995011
 GameObject:
@@ -812,7 +812,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gridPanel: {fileID: 173279587}
   cardPrefab: {fileID: 6501816392888837096, guid: 3c8ef7296678e47438a0dcafb3fdb003, type: 3}
-  numberOfCards: 6
+  spacing: {x: 10, y: 10}
+  padding: {x: 0, y: 0}
+  defaultGridSize: 2
 --- !u!114 &965759981
 MonoBehaviour:
   m_ObjectHideFlags: 0
