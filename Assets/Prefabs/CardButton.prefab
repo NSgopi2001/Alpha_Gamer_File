@@ -90,6 +90,7 @@ GameObject:
   - component: {fileID: 6501816392888837098}
   - component: {fileID: 503774112}
   - component: {fileID: 961838275141247022}
+  - component: {fileID: 4020382959619130465}
   m_Layer: 5
   m_Name: CardButton
   m_TagString: Card
@@ -235,3 +236,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardSO: {fileID: 0}
   cardFrontImage: {fileID: 922777257}
+--- !u!225 &4020382959619130465
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6501816392888837096}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0

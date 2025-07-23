@@ -24,6 +24,9 @@ public class CardsGenerator : MonoBehaviour
         gridLayout = gridPanel.GetComponent<GridLayoutGroup>();
         panelRect = gridPanel.GetComponent<RectTransform>();
 
+        if(GameSettings.Instance != null)
+        SetGrid(GameSettings.Instance.SelectedGridSize);
+        else
         SetGrid(defaultGridSize);
     }
 

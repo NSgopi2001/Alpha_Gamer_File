@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Unity.VisualScripting;
 using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
@@ -46,6 +47,8 @@ public class GameController : MonoBehaviour
         ApplyCardSprites(cardButtonList);
 
         gameGuesses = cardSOList.Count / 2;
+
+        StartCoroutine(PreviewCardsCoroutine());
     }
 
     private void ApplyCardSprites(List<Button> cardList)
@@ -55,14 +58,12 @@ public class GameController : MonoBehaviour
             Card cardComponent = cardList[i].GetComponent<Card>();
             if (cardComponent != null)
             {
+                cardComponent.cardSO = cardSOList[i];
                 cardComponent.SetCardSprite(cardSOList[i].cardSprite);
-            }
-            else
-            {
-                Debug.LogWarning($"No Card component found on {cardList[i].name}");
             }
         }
     }
+
 
 
     private void LoadAllCards()
@@ -154,17 +155,20 @@ public class GameController : MonoBehaviour
         firstGuess = secondGuess = false;
         
     }
-    IEnumerator CheckCardMatch(bool IsMatched, Button firstCard, Button secondCard)
+    IEnumerator CheckCardMatch(bool isMatched, Button firstCard, Button secondCard)
     {
-        if (IsMatched)
+        if (isMatched)
         {
             //firstCard.interactable = false;
             //secondCard.interactable = false;
 
             yield return new WaitForSeconds(1f);
 
-            firstCard.GetComponent<Card>().HideCard();
-            secondCard.GetComponent<Card>().HideCard();
+            firstCard.GetComponent<Card>().FadeCard();
+            secondCard.GetComponent<Card>().FadeCard();
+
+            firstCard.GetComponent<Card>().IsMatched = true;
+            secondCard.GetComponent<Card>().IsMatched = true;
 
             countCorrectGuesses++;
             CheckIfGameIsFinished();
@@ -184,6 +188,29 @@ public class GameController : MonoBehaviour
         }
     }
 
+    IEnumerator PreviewCardsCoroutine()
+    {
+        int previeTimer = 2;
+        // Step 1: Flip all cards to front
+        foreach (var button in cardButtonList)
+        {
+            button.GetComponent<Card>().ShowFront();
+            button.interactable = false; 
+        }
+
+        if(GameSettings.Instance && GameSettings.Instance.SelectedGridSize == GridEnum.GridSize.Grid_5x6)
+            previeTimer = 4;
+        yield return new WaitForSeconds(previeTimer);
+
+        
+        foreach (var button in cardButtonList)
+        {
+            button.GetComponent<Card>().ShowBack();
+            button.interactable = true; // now allow player to click
+        }
+    }
+
+
     private void CheckIfGameIsFinished()
     {
         if(countCorrectGuesses >= gameGuesses)
@@ -197,10 +224,69 @@ public class GameController : MonoBehaviour
         for (int i = 0; i < list.Count; i++)
         {
             int randomIndex = UnityEngine.Random.Range(i, list.Count);
-            CardScriptableObject temp = list[i];
+            var temp = list[i];
             list[i] = list[randomIndex];
             list[randomIndex] = temp;
-            cardButtonList[i].GetComponent<Card>().cardSO = list[i];
         }
     }
+
+    public void SaveGame()
+    {
+        List<Card> cards = new List<Card>();
+        foreach (Button btn in cardButtonList)
+        {
+            Card card = btn.GetComponent<Card>();
+            if (card != null)
+                cards.Add(card);
+        }
+
+        GameSettings.Instance.SaveGame(cards);
+    }
+
+    public void LoadGame()
+    {
+        var loadedCards = GameSettings.Instance.LoadGame();
+        if (loadedCards == null || loadedCards.Count == 0)
+            return;
+
+        cardSOList.Clear();
+
+        foreach (var savedCard in loadedCards)
+        {
+            CardScriptableObject cardSO = System.Array.Find(cardSOArray, c => c.cardName == savedCard.cardName);
+            if (cardSO != null)
+            {
+                cardSOList.Add(cardSO);
+            }
+            else
+            {
+                Debug.LogWarning("Card not found in resources: " + savedCard.cardName);
+            }
+        }
+
+        ApplyCardSprites(cardButtonList);
+
+        for (int i = 0; i < loadedCards.Count; i++)
+        {
+            Card card = cardButtonList[i].GetComponent<Card>();
+            if (card != null)
+            {
+                card.IsMatched = loadedCards[i].isMatched;
+
+                if (card.IsMatched)
+                {
+                    card.HideCard();
+                    cardButtonList[i].interactable = false;
+                }
+                else
+                {
+                    card.ShowBack();
+                    cardButtonList[i].interactable = true;
+                }
+            }
+        }
+
+        Debug.Log("Game state applied from saved data.");
+    }
+
 }
