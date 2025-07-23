@@ -39,7 +39,7 @@ public class ScoreManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
-        LoadScoreData();
+        //LoadScoreData();
         LoadHighScore();
     }
 

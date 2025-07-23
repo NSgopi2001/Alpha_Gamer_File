@@ -29,7 +29,15 @@ public class GameController : MonoBehaviour
 
     private string firstGuessName, secondGuessName;
 
-    [SerializeField] private List<Button> extraButtonsToDisable;
+    [SerializeField] private List<Button> buttonsToDisable;
+
+    private AudioSource audioSource;
+
+    [SerializeField]
+    private GameObject gameCompleteText;
+
+    [SerializeField]
+    private AudioClip cardClickClip, cardMatchClip, cardUnmatchClip, gameOverClip;
 
     private void Awake()
     {
@@ -39,6 +47,8 @@ public class GameController : MonoBehaviour
 
     void Start()
     {
+        audioSource= GetComponent<AudioSource>();
+
         LoadAllCards();
 
         AddListeners();
@@ -139,6 +149,7 @@ public class GameController : MonoBehaviour
 
             cardButtonList[firstGuessIndex].interactable = false;
             cardButtonList[firstGuessIndex].GetComponent<Card>().ShowFront();
+            audioSource.PlayOneShot(cardClickClip);
         }
         else if (!secondGuess)
         {
@@ -148,6 +159,8 @@ public class GameController : MonoBehaviour
 
             cardButtonList[secondGuessIndex].interactable = false;
             cardButtonList[secondGuessIndex].GetComponent<Card>().ShowFront();
+
+            audioSource.PlayOneShot(cardClickClip);
 
             ScoreManager.Instance.IncrementMoves();
             CheckCardNames();
@@ -178,7 +191,7 @@ public class GameController : MonoBehaviour
             firstCard.GetComponent<Card>().IsMatched = true;
             secondCard.GetComponent<Card>().IsMatched = true;
 
-
+            audioSource.PlayOneShot(cardMatchClip);
             ScoreManager.Instance.AddMatchPoints(10);
 
             countCorrectGuesses++;
@@ -194,6 +207,7 @@ public class GameController : MonoBehaviour
             firstCard.interactable = true;
             secondCard.interactable = true;
 
+            audioSource.PlayOneShot(cardUnmatchClip);
             ScoreManager.Instance.ResetCombo();
             ScoreManager.Instance.AddMatchPoints(-2);
             //firstCard.image.sprite = bgSprite;
@@ -205,11 +219,7 @@ public class GameController : MonoBehaviour
     {
         int previeTimer = 2;
 
-        // Disable extra UI buttons
-        foreach (var btn in extraButtonsToDisable)
-        {
-            btn.interactable = false;
-        }
+        UIButtonsDiable();
 
         // Flip all cards to front
         foreach (var button in cardButtonList)
@@ -231,21 +241,43 @@ public class GameController : MonoBehaviour
             button.interactable = true;
         }
 
+        UIButtonsEnable();
+    }
+
+    private void UIButtonsDiable()
+    {
+        // Disable extra UI buttons
+        foreach (var btn in buttonsToDisable)
+        {
+            btn.interactable = false;
+        }
+    }
+
+    private void UIButtonsEnable()
+    {
         // Re-enable the UI buttons
-        foreach (var btn in extraButtonsToDisable)
+        foreach (var btn in buttonsToDisable)
         {
             btn.interactable = true;
         }
     }
-
-
 
     private void CheckIfGameIsFinished()
     {
         if(countCorrectGuesses >= gameGuesses)
         {
             Debug.Log("Game Complete");
+            UIButtonsDiable();
+            StartCoroutine(EnableGameCompletePanel());
         }
+    }
+
+    IEnumerator EnableGameCompletePanel()
+    {
+        yield return new WaitForSeconds(0.5f);
+        audioSource.PlayOneShot(gameOverClip);
+        gameCompleteText.SetActive(true);
+
     }
 
     private void Shuffle(List<CardScriptableObject> list)
