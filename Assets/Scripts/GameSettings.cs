@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class GameSettings : MonoBehaviour
 {
@@ -13,8 +12,6 @@ public class GameSettings : MonoBehaviour
     public static bool hasContinued = false;
 
     private string savePath => Path.Combine(Application.persistentDataPath, "game_save.json");
-
-    public Button continueButton;
 
     void Awake()
     {
@@ -29,24 +26,27 @@ public class GameSettings : MonoBehaviour
         }
     }
 
-    private void Start()
-    {
-        if (HasSaveData())
-        {
-            continueButton.interactable = true;
-
-            // Load grid size from save file
-            string json = File.ReadAllText(savePath);
-            GameSaveData loadedData = JsonUtility.FromJson<GameSaveData>(json);
-            SelectedGridSize = loadedData.gridSize;
-        }
-    }
-
-
     // Called from UI with int index
     public void SetGridSizeByIndex(int index)
     {
         SelectedGridSize = (GridEnum.GridSize)index;
+    }
+
+    public void LoadGridFile()
+    {
+        try
+        {
+            if (File.Exists(savePath))
+            {
+                string json = File.ReadAllText(savePath);
+                GameSaveData loadedData = JsonUtility.FromJson<GameSaveData>(json);
+                SelectedGridSize = loadedData.gridSize;
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"Failed to load grid file: {ex.Message}");
+        }
     }
 
     [System.Serializable]
@@ -94,20 +94,25 @@ public class GameSettings : MonoBehaviour
     /// </summary>
     public GameSaveData LoadGame()
     {
-        if (!File.Exists(savePath))
+        try
         {
-            Debug.LogWarning("No save file found.");
+            if (!File.Exists(savePath))
+            {
+                Debug.LogWarning("No save file found.");
+                return null;
+            }
+
+            string json = File.ReadAllText(savePath);
+            GameSaveData loadedData = JsonUtility.FromJson<GameSaveData>(json);
+            SelectedGridSize = loadedData.gridSize;
+            Debug.Log("Game loaded from file.");
+            return loadedData;
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"Error loading game data: {ex.Message}");
             return null;
         }
-
-        string json = File.ReadAllText(savePath);
-        GameSaveData loadedData = JsonUtility.FromJson<GameSaveData>(json);
-
-        // Restore grid size
-        SelectedGridSize = loadedData.gridSize;
-
-        Debug.Log("Game loaded from file.");
-        return loadedData;
     }
 
     /// <summary>

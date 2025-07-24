@@ -7,6 +7,7 @@ public class ScoreManager : MonoBehaviour
 
     public int Score { get; private set; }
     public int Moves { get; private set; }
+    public int MovesToFinish { get; private set; }
     public int ComboMultiplier { get; private set; }
     public int HighScore { get; private set; }
 
@@ -21,6 +22,7 @@ public class ScoreManager : MonoBehaviour
     {
         public int score;
         public int moves;
+        public int movesToFinish;
     }
 
     [System.Serializable]
@@ -109,7 +111,8 @@ public class ScoreManager : MonoBehaviour
         ScoreSaveData data = new ScoreSaveData
         {
             score = Score,
-            moves = Moves
+            moves = Moves,
+            movesToFinish = MovesToFinish,
         };
 
         string json = JsonUtility.ToJson(data, true);
@@ -124,11 +127,11 @@ public class ScoreManager : MonoBehaviour
         {
             string json = File.ReadAllText(scorePath);
             ScoreSaveData data = JsonUtility.FromJson<ScoreSaveData>(json);
-            SetScore(data.score, data.moves);  
+            SetScore(data.score, data.moves, data.movesToFinish);  
         }
         else
         {
-            SetScore(0, 0);
+            SetScore(0, 0, 0);
         }
     }
 
@@ -164,10 +167,28 @@ public class ScoreManager : MonoBehaviour
         HighScore = 0;
     }
 
-    public void SetScore(int score, int moves)
+    public void SetScore(int score, int moves, int movesToFinish)
     {
         Score = score;
         Moves = moves;
+        MovesToFinish = movesToFinish;
     }
+
+    void OnApplicationPause(bool pauseStatus)
+    {
+        if (pauseStatus && ScoreManager.Instance != null)
+        {
+            ScoreManager.Instance.SaveScoreData();
+        }
+    }
+
+    void OnApplicationQuit()
+    {
+        if (ScoreManager.Instance != null)
+        {
+            ScoreManager.Instance.SaveScoreData();
+        }
+    }
+
 
 }

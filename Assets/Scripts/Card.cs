@@ -26,20 +26,24 @@ public class Card : MonoBehaviour
 
     public void SetCardSprite(Sprite sprite)
     {
-        cardFrontImage.sprite = sprite;
+        if (cardFrontImage != null)
+            cardFrontImage.sprite = sprite;
     }
 
     public void ShowFront()
     {
         animator.SetBool("Back", false);
+        animator.SetBool("Front", false);
         animator.SetBool("Front", true);
     }
 
     public void ShowBack()
     {
         animator.SetBool("Front", false);
+        animator.SetBool("Back", false);
         animator.SetBool("Back", true);
     }
+
 
     public void HideCard()
     {

@@ -1,10 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using Unity.VisualScripting;
-using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -42,7 +38,6 @@ public class GameController : MonoBehaviour
     private void Awake()
     {
         cardSOArray = Resources.LoadAll<CardScriptableObject>("CardSO");
-
     }
 
     void Start()
@@ -66,7 +61,11 @@ public class GameController : MonoBehaviour
             LoadGame();
         }
 
-        StartCoroutine(PreviewCardsCoroutine());
+        if (GameSettings.Instance && !GameSettings.Instance.GetContinueBool())
+        {
+            StartCoroutine(PreviewCardsCoroutine());
+        }
+        
     }
 
     private void ApplyCardSprites(List<Button> cardList)
@@ -113,21 +112,22 @@ public class GameController : MonoBehaviour
 
     private void AddCardData()
     {
-        int looper = cardButtonList.Count;
-        int index = 0;
+        int totalCards = cardButtonList.Count;
+        int totalPairs = totalCards / 2;
+        int cardSOIndex = 0;
 
-        for (int i = 0; i < looper; i++)
+        for (int i = 0; i < totalCards; i++)
         {
-            if(index == looper/2)
+            if (cardSOIndex == totalPairs)
             {
-                index = 0;
+                cardSOIndex = 0;
             }
-            cardSOList.Add(cardSOArray[index]);
-            //cardButtonList[i].GetComponent<Card>().cardSO = cardSOList[index];
-            index++;
-        }
 
+            cardSOList.Add(cardSOArray[cardSOIndex]);
+            cardSOIndex++;
+        }
     }
+
 
     private void AddListeners()
     {
@@ -149,6 +149,7 @@ public class GameController : MonoBehaviour
 
             cardButtonList[firstGuessIndex].interactable = false;
             cardButtonList[firstGuessIndex].GetComponent<Card>().ShowFront();
+            if(firstClickClip)
             audioSource.PlayOneShot(firstClickClip);
         }
         else if (!secondGuess)
@@ -160,6 +161,7 @@ public class GameController : MonoBehaviour
             cardButtonList[secondGuessIndex].interactable = false;
             cardButtonList[secondGuessIndex].GetComponent<Card>().ShowFront();
 
+            if(secondClickClip)
             audioSource.PlayOneShot(secondClickClip);
 
             ScoreManager.Instance.IncrementMoves();
@@ -191,7 +193,8 @@ public class GameController : MonoBehaviour
             firstCard.GetComponent<Card>().IsMatched = true;
             secondCard.GetComponent<Card>().IsMatched = true;
 
-            audioSource.PlayOneShot(cardMatchClip);
+            if (cardMatchClip)
+                audioSource.PlayOneShot(cardMatchClip);
             ScoreManager.Instance.AddMatchPoints(10);
 
             countCorrectGuesses++;
@@ -207,7 +210,8 @@ public class GameController : MonoBehaviour
             firstCard.interactable = true;
             secondCard.interactable = true;
 
-            audioSource.PlayOneShot(cardUnmatchClip);
+            if (cardUnmatchClip)
+                audioSource.PlayOneShot(cardUnmatchClip);
             ScoreManager.Instance.ResetCombo();
             ScoreManager.Instance.AddMatchPoints(-2);
             //firstCard.image.sprite = bgSprite;
@@ -275,7 +279,8 @@ public class GameController : MonoBehaviour
     IEnumerator EnableGameCompletePanel()
     {
         yield return new WaitForSeconds(0.5f);
-        audioSource.PlayOneShot(gameOverClip);
+        if (gameOverClip)
+            audioSource.PlayOneShot(gameOverClip);
         gameCompleteText.SetActive(true);
 
         UIButtonsEnable();
@@ -372,10 +377,13 @@ public class GameController : MonoBehaviour
         if (ScoreManager.Instance)
         {
             ScoreManager.Instance.LoadScoreData();
+            gameGuesses = ScoreManager.Instance?.MovesToFinish > 0
+            ? ScoreManager.Instance.MovesToFinish
+            : loadedData.cards.Count / 2;
+
         }
 
-        
-    }
 
+    }
 
 }

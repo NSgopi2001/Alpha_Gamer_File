@@ -345,9 +345,8 @@ GameObject:
   m_Component:
   - component: {fileID: 331096383}
   - component: {fileID: 331096382}
-  - component: {fileID: 331096384}
   m_Layer: 0
-  m_Name: SceneManager
+  m_Name: SceneLoader
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -365,6 +364,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20d01f06a9384804baecab47b9559352, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  continueButton: {fileID: 424951019}
 --- !u!4 &331096383
 Transform:
   m_ObjectHideFlags: 0
@@ -380,21 +380,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &331096384
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 331096381}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 506f17936d4bb9741bcbbd2152808a51, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SelectedGridSize: 1
-  LastSavedCards: []
-  continueButton: {fileID: 424951019}
 --- !u!1 &424951017
 GameObject:
   m_ObjectHideFlags: 0
@@ -503,7 +488,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
-      - m_Target: {fileID: 331096384}
+      - m_Target: {fileID: 1541623126}
         m_TargetAssemblyTypeName: GameSettings, Assembly-CSharp
         m_MethodName: SetContinueBool
         m_Mode: 6
@@ -1396,9 +1381,9 @@ MonoBehaviour:
           m_StringArgument: Game
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 331096384}
-        m_TargetAssemblyTypeName: GameSettings, Assembly-CSharp
-        m_MethodName: SetGridSizeByIndex
+      - m_Target: {fileID: 331096382}
+        m_TargetAssemblyTypeName: SceneLoader, Assembly-CSharp
+        m_MethodName: SetGridSize
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1970,9 +1955,9 @@ MonoBehaviour:
           m_StringArgument: Game
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 331096384}
-        m_TargetAssemblyTypeName: GameSettings, Assembly-CSharp
-        m_MethodName: SetGridSizeByIndex
+      - m_Target: {fileID: 331096382}
+        m_TargetAssemblyTypeName: SceneLoader, Assembly-CSharp
+        m_MethodName: SetGridSize
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2147,6 +2132,52 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!1 &1541623125
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1541623127}
+  - component: {fileID: 1541623126}
+  m_Layer: 0
+  m_Name: SceneManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1541623126
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1541623125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 506f17936d4bb9741bcbbd2152808a51, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SelectedGridSize: 1
+  LastSavedCards: []
+--- !u!4 &1541623127
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1541623125}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1058.9956, y: 656.45917, z: -12.991635}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1594641415
 GameObject:
   m_ObjectHideFlags: 0
@@ -2454,9 +2485,9 @@ MonoBehaviour:
           m_StringArgument: Game
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 331096384}
-        m_TargetAssemblyTypeName: GameSettings, Assembly-CSharp
-        m_MethodName: SetGridSizeByIndex
+      - m_Target: {fileID: 331096382}
+        m_TargetAssemblyTypeName: SceneLoader, Assembly-CSharp
+        m_MethodName: SetGridSize
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
