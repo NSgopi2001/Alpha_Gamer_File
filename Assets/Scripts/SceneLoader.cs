@@ -1,4 +1,5 @@
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -12,6 +13,9 @@ public class SceneLoader : MonoBehaviour
         if (GameSettings.Instance && continueButton && GameSettings.Instance.HasSaveData())
         {
             continueButton.interactable = true;
+            if(continueButton.GetComponentInChildren<TextMeshProUGUI>() != null ) 
+            continueButton.GetComponentInChildren<TextMeshProUGUI>().color = Color.white;
+                
 
             GameSettings.Instance.LoadGridFile();
         }
@@ -30,8 +34,6 @@ public class SceneLoader : MonoBehaviour
             GameSettings.Instance.SetContinueBool(isContinuing);
 
         SceneManager.LoadScene(sceneName);
-
-        yield return new WaitForSeconds(0.1f);
 
         if (isContinuing && ScoreManager.Instance)
             ScoreManager.Instance.LoadScoreData();

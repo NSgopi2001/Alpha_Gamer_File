@@ -35,6 +35,8 @@ public class GameController : MonoBehaviour
     [SerializeField]
     private AudioClip firstClickClip, secondClickClip, cardMatchClip, cardUnmatchClip, gameOverClip;
 
+    private bool isGameComplete;
+
     private void Awake()
     {
         cardSOArray = Resources.LoadAll<CardScriptableObject>("CardSO");
@@ -43,6 +45,8 @@ public class GameController : MonoBehaviour
     void Start()
     {
         audioSource= GetComponent<AudioSource>();
+
+        isGameComplete = false;
 
         LoadAllCards();
 
@@ -271,6 +275,7 @@ public class GameController : MonoBehaviour
         if(countCorrectGuesses >= gameGuesses)
         {
             Debug.Log("Game Complete");
+            isGameComplete = true;
             UIButtonsDiable();
             StartCoroutine(EnableGameCompletePanel());
         }
@@ -299,7 +304,7 @@ public class GameController : MonoBehaviour
 
     public void SaveGame()
     {
-        if (!GameSettings.Instance)
+        if (!GameSettings.Instance || isGameComplete)
         {
             return;
         }
@@ -315,7 +320,7 @@ public class GameController : MonoBehaviour
 
         if (ScoreManager.Instance)
         {
-            ScoreManager.Instance.SaveScoreData();
+            ScoreManager.Instance.SaveScoreData(gameGuesses - countCorrectGuesses);
         }
     }
 
@@ -377,13 +382,25 @@ public class GameController : MonoBehaviour
         if (ScoreManager.Instance)
         {
             ScoreManager.Instance.LoadScoreData();
-            gameGuesses = ScoreManager.Instance?.MovesToFinish > 0
-            ? ScoreManager.Instance.MovesToFinish
-            : loadedData.cards.Count / 2;
-
+            gameGuesses = ScoreManager.Instance.MovesToFinish;
         }
 
 
     }
 
+    //void OnApplicationPause(bool pauseStatus)
+    //{
+    //    if (pauseStatus && ScoreManager.Instance != null)
+    //    {
+    //        ScoreManager.Instance.SaveScoreData(gameGuesses);
+    //    }
+    //}
+
+    //void OnApplicationQuit()
+    //{
+    //    if (ScoreManager.Instance != null)
+    //    {
+    //        ScoreManager.Instance.SaveScoreData(gameGuesses);
+    //    }
+    //}
 }

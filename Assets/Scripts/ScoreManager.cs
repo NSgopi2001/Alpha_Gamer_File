@@ -106,18 +106,18 @@ public class ScoreManager : MonoBehaviour
         }
     }
 
-    public void SaveScoreData()
+    public void SaveScoreData(int movesTofinishSave)
     {
         ScoreSaveData data = new ScoreSaveData
         {
             score = Score,
             moves = Moves,
-            movesToFinish = MovesToFinish,
+            movesToFinish = movesTofinishSave,
         };
 
         string json = JsonUtility.ToJson(data, true);
         File.WriteAllText(scorePath, json);
-        Debug.Log("Score saved: " + json); // <-- Add this
+        Debug.Log("Score saved: " + json);
     }
 
 
@@ -127,7 +127,8 @@ public class ScoreManager : MonoBehaviour
         {
             string json = File.ReadAllText(scorePath);
             ScoreSaveData data = JsonUtility.FromJson<ScoreSaveData>(json);
-            SetScore(data.score, data.moves, data.movesToFinish);  
+            SetScore(data.score, data.moves, data.movesToFinish);
+            Debug.Log(data.movesToFinish);
         }
         else
         {
@@ -173,22 +174,5 @@ public class ScoreManager : MonoBehaviour
         Moves = moves;
         MovesToFinish = movesToFinish;
     }
-
-    void OnApplicationPause(bool pauseStatus)
-    {
-        if (pauseStatus && ScoreManager.Instance != null)
-        {
-            ScoreManager.Instance.SaveScoreData();
-        }
-    }
-
-    void OnApplicationQuit()
-    {
-        if (ScoreManager.Instance != null)
-        {
-            ScoreManager.Instance.SaveScoreData();
-        }
-    }
-
 
 }
